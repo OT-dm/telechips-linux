@@ -135,6 +135,11 @@ collect_files()
 	echo "$res"
 }
 
+if test "${NOLOCALVERSION}set" != "set"; then
+	echo ""
+	exit
+fi
+
 if $scm_only; then
 	if test ! -e .scmversion; then
 		res=$(scm_version)
@@ -149,6 +154,7 @@ else
 	echo "Error: kernelrelease not valid - run 'make prepare' to update it"
 	exit 1
 fi
+
 
 # localversion* files in the build and source directory
 res="$(collect_files localversion*)"
