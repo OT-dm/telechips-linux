@@ -1,0 +1,25 @@
+# Compiled source #
+###################
+*.o
+*.so
+*.cmd
+*.a
+
+# Generated during build #
+##########################
+*.d
+*.S
+*.map
+*.s
+
+.config
+.tmp_vmlinux1
+.tmp_vmlinux2
+.version
+Module.symvers
+include/config/
+include/generated/
+include/linux/version.h
+vmlinux
+drivers/gpu/mali.r2p4-02rel0/mali/__malidrv_build_info.c
+drivers/gpu/mali.r2p4-02rel0/mali/arch
