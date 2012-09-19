@@ -187,12 +187,13 @@ else
 EXTRA_CFLAGS += -I$(src)/linux/license/gpl
 endif
 # Source files which always are included in a build
+#	common/mali_session.c \
+
 SRC = \
 	common/mali_kernel_core.c \
 	linux/mali_kernel_linux.c \
 	$(OSKOS)/mali_osk_indir_mmap.c \
 	common/mali_kernel_descriptor_mapping.c \
-	common/mali_session.c \
 	common/mali_device_pause_resume.c \
 	common/mali_kernel_vsync.c \
 	linux/mali_ukk_vsync.c \

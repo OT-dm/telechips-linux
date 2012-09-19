@@ -361,6 +361,7 @@ static int ump_file_ioctl(struct inode *inode, struct file *filp, unsigned int c
 	return err;
 }
 
+/* ../mali/linux/mali_kernel_linux.c:int map_errcode( _mali_osk_errcode_t err ) is used instead
 int map_errcode( _mali_osk_errcode_t err )
 {
     switch(err)
@@ -375,7 +376,7 @@ int map_errcode( _mali_osk_errcode_t err )
         case _MALI_OSK_ERR_ITEM_NOT_FOUND: return -ENOENT;
         default: return -EFAULT;
     }
-}
+}*/
 
 /*
  * Handle from OS to map specified virtual memory to specified UMP memory.

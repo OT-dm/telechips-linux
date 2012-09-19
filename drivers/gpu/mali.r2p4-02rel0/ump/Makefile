@@ -14,15 +14,15 @@ UDD_FILE_PREFIX = ../mali/
 ifneq ($(KBUILD_EXTMOD),)
 include $(KBUILD_EXTMOD)/Makefile.common
 else
-include ./Makefile.common
+include $(src)/Makefile.common
 endif
 
 # For each arch check: CROSS_COMPILE , KDIR , CFLAGS += -DARCH
 
-ARCH ?= arm
-BUILD ?= debug
+ARCH = arm
+BUILD = release
 
-EXTRA_CFLAGS += -DDEBUG -DMALI_STATE_TRACKING=0
+#EXTRA_CFLAGS += -DDEBUG -DMALI_STATE_TRACKING=0
 ifeq ($(BUILD), debug)
 EXTRA_CFLAGS += -DDEBUG
 endif
@@ -32,17 +32,15 @@ endif
 ifneq ($(KERNELRELEASE),)
 # Inside the kernel build system
 
-EXTRA_CFLAGS += -I$(KBUILD_EXTMOD) -I$(KBUILD_EXTMOD)/common -I$(KBUILD_EXTMOD)/linux -I$(KBUILD_EXTMOD)/../mali/common -I$(KBUILD_EXTMOD)/../mali/linux -I$(KBUILD_EXTMOD)/../../ump/include/ump
+#EXTRA_CFLAGS += -I$(KBUILD_EXTMOD) -I$(KBUILD_EXTMOD)/common -I$(KBUILD_EXTMOD)/linux -I$(KBUILD_EXTMOD)/../mali/common -I$(KBUILD_EXTMOD)/../mali/linux -I$(KBUILD_EXTMOD)/../../ump/include/ump
+
+EXTRA_CFLAGS += -I$(src) -I$(src)/arch -I$(src)/common -I$(src)/linux -I$(src)/linux/license/gpl -I$(src)/../mali/common -I$(src)/../mali/linux -I$(src)/include/ump
 
 # For customer releases the Linux Device Drivers will be provided as ARM proprietary and GPL releases:
 # The ARM proprietary product will only include the license/proprietary directory
 # The GPL product will only include the license/gpl directory
 
-ifeq ($(wildcard $(KBUILD_EXTMOD)/linux/license/gpl/*),)
-EXTRA_CFLAGS += -I$(KBUILD_EXTMOD)/linux/license/proprietary
-else
 EXTRA_CFLAGS += -I$(KBUILD_EXTMOD)/linux/license/gpl
-endif
 
 SRC +=	$(UMP_FILE_PREFIX)linux/ump_kernel_linux.c \
 	$(UMP_FILE_PREFIX)linux/ump_kernel_memory_backend_os.c \
@@ -52,19 +50,24 @@ SRC +=	$(UMP_FILE_PREFIX)linux/ump_kernel_linux.c \
 	$(UMP_FILE_PREFIX)linux/ump_ukk_ref_wrappers.c \
 	$(UMP_FILE_PREFIX)linux/ump_osk_atomics.c \
 	$(UMP_FILE_PREFIX)linux/ump_osk_low_level_mem.c \
-	$(UMP_FILE_PREFIX)linux/ump_osk_misc.c \
-	$(UDD_FILE_PREFIX)linux/mali_osk_atomics.c \
-	$(UDD_FILE_PREFIX)linux/mali_osk_locks.c \
-	$(UDD_FILE_PREFIX)linux/mali_osk_memory.c \
-	$(UDD_FILE_PREFIX)linux/mali_osk_math.c \
-	$(UDD_FILE_PREFIX)linux/mali_osk_misc.c
+	$(UMP_FILE_PREFIX)linux/ump_osk_misc.c 
+
+#\
+#	$(UDD_FILE_PREFIX)linux/mali_osk_atomics.c \
+#	$(UDD_FILE_PREFIX)linux/mali_osk_locks.c \
+#	$(UDD_FILE_PREFIX)linux/mali_osk_memory.c \
+#	$(UDD_FILE_PREFIX)linux/mali_osk_math.c \
+#	$(UDD_FILE_PREFIX)linux/mali_osk_misc.c
 
 # Selecting files to compile by parsing the config file
 
-MODULE:=ump.ko
+obj-$(CONFIG_MALI_UMP) += ump.o
 
-obj-m := $(MODULE:.ko=.o)
-$(MODULE:.ko=-y) := $(SRC:.c=.o)
+ump-y := $(SRC:.c=.o)
+
+#MODULE:=ump.ko
+#obj-m := $(MODULE:.ko=.o)
+#$(MODULE:.ko=-y) := $(SRC:.c=.o)
 
 else
 # Outside the kernel build system

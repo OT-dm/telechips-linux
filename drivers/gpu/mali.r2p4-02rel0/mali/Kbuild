@@ -13,11 +13,37 @@
 OSKOS=linux
 FILES_PREFIX=
 
+ARCH = arm
+BUILD = release
+ifeq ($(CONFIG_MALI_UMP),y)
+USING_UMP = 1
+else
+USING_UMP = 0
+endif
+ifeq ($(CONFIG_MALI_OS_MEMORY),y)
+USING_OS_MEMORY = 1
+else
+USING_OS_MEMORY = 0
+endif
+ifeq ($(CONFIG_GPU_BUS_SCALING),y)
+USING_GPU_UTILIZATION = 1
+else
+USING_GPU_UTILIZATION = 0
+endif
+ifeq ($(CONFIG_ARCH_TCC),y)
+  ifeq ($(CONFIG_ARCH_TCC892X),y)
+  TARGET_PLATFORM = tcc-m400
+  else
+  TARGET_PLATFORM = tcc-m200
+  endif
+  CONFIG = $(TARGET_PLATFORM)
+endif
+
 # set up defaults if not defined by the user
 USING_UMP ?= 0
 USING_OS_MEMORY ?= 0
-USING_MALI_PMU ?= 0
-USING_PMM ?= 1
+USING_MALI_PMU = 1
+USING_PMM = 1
 USING_GPU_UTILIZATION ?= 0
 USING_MALI_RUN_TIME_PM ?= 1
 USING_MALI_PMM_TESTSUITE ?= 0
@@ -28,10 +54,10 @@ DISABLE_PP1 ?= 0
 DISABLE_PP2 ?= 0
 DISABLE_PP3 ?= 0
 TIMESTAMP ?= default
-BUILD ?= debug
-TARGET_PLATFORM ?= default
-KERNEL_RUNTIME_PM_ENABLED ?= 0
-CONFIG ?= pb-virtex5-m200
+BUILD ?= release
+TARGET_PLATFORM ?= tcc-m400
+KERNEL_RUNTIME_PM_ENABLED = 1
+CONFIG ?= tcc-m400
 
 # Get path to driver source from Linux build system
 DRIVER_DIR=$(src)
@@ -100,7 +126,7 @@ DEFINES += -DMALI_UKK_HAS_IMPLICIT_MMAP_CLEANUP
 
 ifeq ($(USING_UMP),1)
 	DEFINES += -DMALI_USE_UNIFIED_MEMORY_PROVIDER=1
-	ccflags-y += -I$(DRIVER_DIR)/../../ump/include/ump
+	ccflags-y += -I$(DRIVER_DIR)/../ump/include/ump
 else
 	DEFINES += -DMALI_USE_UNIFIED_MEMORY_PROVIDER=0
 endif
@@ -222,8 +248,11 @@ ifneq ($(call submodule_enabled, $(DRIVER_DIR), MALI300L2),0)
 endif
 
 # Tell the Linux build system from which .o file to create the kernel module
-obj-m := mali.o
+#obj-m := mali.o
 # Tell the Linux build system to enable building of our .c files
+#mali-y := $(SRC:.c=.o)
+
+obj-$(CONFIG_MALI_GPU) += mali.o
 mali-y := $(SRC:.c=.o)
 
 # Extend common version-string
